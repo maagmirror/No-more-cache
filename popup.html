@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      :root {
+        --bg: #12151c;
+        --panel: #1a1f2a;
+        --line: #262d3a;
+        --ink: #e8eaed;
+        --mute: #7d8590;
+        --ok: #3fb950;
+        --local: #d29922;
+        --edge: #f85149;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        width: 400px;
+        margin: 0;
+        padding: 14px;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          12px/1.5 ui-monospace,
+          'Cascadia Code',
+          Consolas,
+          monospace;
+      }
+
+      label {
+        display: block;
+        color: var(--mute);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 10px;
+        margin-bottom: 5px;
+      }
+
+      input {
+        width: 100%;
+        padding: 7px 8px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        color: var(--ink);
+        font: inherit;
+      }
+
+      input:focus,
+      button:focus-visible {
+        outline: 2px solid #3d7eff;
+        outline-offset: 1px;
+      }
+
+      button {
+        width: 100%;
+        margin-top: 8px;
+        padding: 8px;
+        background: var(--ink);
+        color: var(--bg);
+        border: 0;
+        border-radius: 4px;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      button:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+
+      #verdict {
+        margin-top: 14px;
+        padding: 11px 12px;
+        border-left: 3px solid var(--mute);
+        background: var(--panel);
+        border-radius: 0 4px 4px 0;
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      #verdict.ok {
+        border-color: var(--ok);
+      }
+      #verdict.local {
+        border-color: var(--local);
+      }
+      #verdict.edge {
+        border-color: var(--edge);
+      }
+
+      #verdict b {
+        display: block;
+        margin-bottom: 3px;
+      }
+      #verdict.ok b {
+        color: var(--ok);
+      }
+      #verdict.local b {
+        color: var(--local);
+      }
+      #verdict.edge b {
+        color: var(--edge);
+      }
+
+      #verdict span {
+        color: var(--mute);
+      }
+
+      table {
+        width: 100%;
+        margin-top: 12px;
+        border-collapse: collapse;
+      }
+      td {
+        padding: 3px 0;
+        vertical-align: top;
+        word-break: break-all;
+      }
+      td:first-child {
+        color: var(--mute);
+        width: 130px;
+        padding-right: 10px;
+      }
+      tr + tr td {
+        border-top: 1px solid var(--line);
+      }
+
+      #watch {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      #watch input {
+        width: auto;
+        margin: 0;
+        accent-color: var(--ok);
+      }
+      #watch label {
+        margin: 0;
+        font-size: 12px;
+        text-transform: none;
+        letter-spacing: 0;
+        color: var(--ink);
+        cursor: pointer;
+      }
+      #nota {
+        margin: 0 0 12px 24px;
+        color: var(--mute);
+        font-size: 11px;
+        line-height: 1.4;
+      }
+      hr {
+        border: 0;
+        border-top: 1px solid var(--line);
+        margin: 0 0 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="watch">
+      <input type="checkbox" id="chk" />
+      <label for="chk" id="chkLabel">Keep this site always fresh</label>
+    </div>
+    <p id="note">
+      No cache for this host on this machine. Loads slower, but you never see a
+      stale asset.
+    </p>
+
+    <hr />
+
+    <label for="url">File to check</label>
+    <input id="url" type="text" spellcheck="false" />
+    <button id="run">Check</button>
+
+    <div id="verdict" hidden></div>
+    <table id="headers" hidden></table>
+
+    <button
+      id="purge"
+      style="background: #262d3a; color: var(--ink); margin-top: 12px"
+    >
+      Purge this browser's cache
+    </button>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
