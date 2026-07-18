@@ -1,0 +1,32 @@
+name: Package extension
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Zip extension
+        run: |
+          zip -j no-more-cache.zip \
+            manifest.json \
+            background.js \
+            popup.html \
+            popup.js \
+            icon16.png \
+            icon32.png \
+            icon48.png \
+            icon128.png
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: no-more-cache.zip
