@@ -38,7 +38,12 @@ async function download(url) {
 function paint(className, title, detail) {
   $ver.hidden = false;
   $ver.className = className;
-  $ver.innerHTML = `<b>${title}</b><span>${detail}</span>`;
+  $ver.replaceChildren();
+  const b = document.createElement('b');
+  b.textContent = title;
+  const span = document.createElement('span');
+  span.textContent = detail;
+  $ver.append(b, span);
 }
 
 $run.addEventListener('click', async () => {
