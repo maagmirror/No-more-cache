@@ -11,12 +11,29 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Zip extension
+      - name: Build Chrome package
         run: |
-          zip -j no-more-cache.zip \
+          cp manifest.chrome.json manifest.json
+
+          zip -j no-more-cache-chrome.zip \
+            manifest.json \
+            background.js \
+            popup.html \
+            popup.js \
+            icon16.png \
+            icon32.png \
+            icon48.png \
+            icon128.png
+
+      - name: Build Firefox package
+        run: |
+          cp manifest.firefox.json manifest.json
+
+          zip -j no-more-cache-firefox.zip \
             manifest.json \
             background.js \
             popup.html \
@@ -29,4 +46,6 @@ jobs:
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          files: no-more-cache.zip
+          files: |
+            no-more-cache-chrome.zip
+            no-more-cache-firefox.zip
