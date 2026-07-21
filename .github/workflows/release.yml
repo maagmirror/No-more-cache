@@ -21,13 +21,15 @@ jobs:
 
           zip -j no-more-cache-chrome.zip \
             manifest.json \
-            background.js \
+            background.chrome.js \
             popup.html \
             popup.js \
             icon16.png \
             icon32.png \
             icon48.png \
             icon128.png
+
+          rm manifest.json
 
       - name: Build Firefox package
         run: |
@@ -35,13 +37,15 @@ jobs:
 
           zip -j no-more-cache-firefox.zip \
             manifest.json \
-            background.js \
+            background.firefox.js \
             popup.html \
             popup.js \
             icon16.png \
             icon32.png \
             icon48.png \
             icon128.png
+
+          rm manifest.json
 
       - name: Create release
         uses: softprops/action-gh-release@v2

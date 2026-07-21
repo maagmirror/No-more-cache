@@ -1,3 +1,9 @@
+// Shared popup for Chrome and Firefox.
+// Firefox exposes the promise-based `browser` namespace; Chrome (MV3) exposes
+// `chrome`, whose APIs also return promises when no callback is passed. Using
+// `browser ?? chrome` lets this single file run unchanged on both.
+const B = globalThis.browser ?? globalThis.chrome;
+
 const $url = document.getElementById('url');
 const $run = document.getElementById('run');
 const $ver = document.getElementById('verdict');
@@ -14,7 +20,7 @@ const HEADERS = [
   'server',
 ];
 
-chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+B.tabs.query({ active: true, currentWindow: true }).then(([tab]) => {
   if (tab?.url) $url.value = tab.url;
 });
 
@@ -99,19 +105,32 @@ document.getElementById('purge').addEventListener('click', async (ev) => {
   btn.disabled = true;
   btn.textContent = 'Purging…';
 
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  const [tab] = await B.tabs.query({ active: true, currentWindow: true });
 
   if (/^https?:/.test(tab?.url || '')) {
-    const { origin } = new URL(tab.url);
-    await chrome.browsingData.remove(
-      { origins: [origin] },
-      { cacheStorage: true, serviceWorkers: true }
-    );
+    const { origin, hostname } = new URL(tab.url);
+    try {
+      // Chrome: origin-scoped Cache Storage + service workers.
+      await B.browsingData.remove(
+        { origins: [origin] },
+        { cacheStorage: true, serviceWorkers: true }
+      );
+    } catch {
+      // Firefox has no `cacheStorage`/`origins` granularity -> best-effort:
+      // drop service workers by hostname; the full cache wipe below covers the
+      // rest. Guarded because older builds may not support `hostnames` either.
+      try {
+        await B.browsingData.remove(
+          { hostnames: [hostname] },
+          { serviceWorkers: true }
+        );
+      } catch {}
+    }
   }
 
-  await chrome.browsingData.removeCache({ since: 0 });
+  await B.browsingData.removeCache({ since: 0 });
 
-  if (tab?.id) await chrome.tabs.reload(tab.id, { bypassCache: true });
+  if (tab?.id) await B.tabs.reload(tab.id, { bypassCache: true });
   window.close();
 });
 
@@ -120,7 +139,7 @@ const $chkLabel = document.getElementById('chkLabel');
 let host = null;
 
 (async () => {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  const [tab] = await B.tabs.query({ active: true, currentWindow: true });
   if (!/^https?:/.test(tab?.url || '')) {
     $chk.disabled = true;
     $chkLabel.textContent = 'This tab is not a website';
@@ -128,24 +147,24 @@ let host = null;
   }
   host = new URL(tab.url).hostname;
   $chkLabel.textContent = `Keep ${host} always fresh`;
-  const { hosts } = await chrome.storage.sync.get({ hosts: [] });
+  const { hosts } = await B.storage.sync.get({ hosts: [] });
   $chk.checked = hosts.includes(host);
 })();
 
 $chk.addEventListener('change', async () => {
-  const { hosts } = await chrome.storage.sync.get({ hosts: [] });
+  const { hosts } = await B.storage.sync.get({ hosts: [] });
   const next = $chk.checked
     ? [...new Set([...hosts, host])]
     : hosts.filter((h) => h !== host);
 
-  await chrome.storage.sync.set({ hosts: next });
+  await B.storage.sync.set({ hosts: next });
 
   if ($chk.checked) {
-    await chrome.browsingData.removeCache({ since: 0 });
-    const [tab] = await chrome.tabs.query({
+    await B.browsingData.removeCache({ since: 0 });
+    const [tab] = await B.tabs.query({
       active: true,
       currentWindow: true,
     });
-    if (tab?.id) chrome.tabs.reload(tab.id, { bypassCache: true });
+    if (tab?.id) B.tabs.reload(tab.id, { bypassCache: true });
   }
 });
