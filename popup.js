@@ -1,7 +1,4 @@
-// Shared popup for Chrome and Firefox.
-// Firefox exposes the promise-based `browser` namespace; Chrome (MV3) exposes
-// `chrome`, whose APIs also return promises when no callback is passed. Using
-// `browser ?? chrome` lets this single file run unchanged on both.
+// `browser` on Firefox (promises), `chrome` on Chrome — shared popup for both.
 const B = globalThis.browser ?? globalThis.chrome;
 
 const $url = document.getElementById('url');
@@ -110,15 +107,12 @@ document.getElementById('purge').addEventListener('click', async (ev) => {
   if (/^https?:/.test(tab?.url || '')) {
     const { origin, hostname } = new URL(tab.url);
     try {
-      // Chrome: origin-scoped Cache Storage + service workers.
       await B.browsingData.remove(
         { origins: [origin] },
         { cacheStorage: true, serviceWorkers: true }
       );
     } catch {
-      // Firefox has no `cacheStorage`/`origins` granularity -> best-effort:
-      // drop service workers by hostname; the full cache wipe below covers the
-      // rest. Guarded because older builds may not support `hostnames` either.
+      // Firefox has no cacheStorage/origins granularity; the full wipe below covers it.
       try {
         await B.browsingData.remove(
           { hostnames: [hostname] },
