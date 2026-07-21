@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "No More Cache — per-site cache killer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Clear and disable browser + CDN cache per site. Keep chosen sites always fresh — no stale images, scripts, or CSS.",
   "permissions": [
     "browsingData",
