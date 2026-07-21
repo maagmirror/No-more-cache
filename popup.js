@@ -70,13 +70,22 @@ $run.addEventListener('click', async () => {
     ]);
 
     $hdr.hidden = false;
-    $hdr.innerHTML =
-      HEADERS.map((h) => {
-        const v = clean.res.headers.get(h);
-        return v ? `<tr><td>${h}</td><td>${v}</td></tr>` : '';
-      }).join('') +
-      `<tr><td>hash · clean URL</td><td>${clean.sum}</td></tr>` +
-      `<tr><td>hash · new URL</td><td>${fresh.sum}</td></tr>`;
+    $hdr.replaceChildren();
+    const addRow = (k, val) => {
+      const tr = document.createElement('tr');
+      const td1 = document.createElement('td');
+      td1.textContent = k;
+      const td2 = document.createElement('td');
+      td2.textContent = val;
+      tr.append(td1, td2);
+      $hdr.append(tr);
+    };
+    for (const h of HEADERS) {
+      const v = clean.res.headers.get(h);
+      if (v) addRow(h, v);
+    }
+    addRow('hash · clean URL', clean.sum);
+    addRow('hash · new URL', fresh.sum);
 
     if (clean.sum !== fresh.sum) {
       paint(
