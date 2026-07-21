@@ -5,21 +5,24 @@
   "description": "Clear and disable browser + CDN cache per site. Keep chosen sites always fresh — no stale images, scripts, or CSS.",
   "browser_specific_settings": {
     "gecko": {
-      "id": "no-more-cache@nibiru.com.uy"
+      "id": "no-more-cache@nibiru.com.uy",
+      "strict_min_version": "128.0"
     }
   },
   "permissions": [
     "browsingData",
     "tabs",
     "storage",
-    "webNavigation"
+    "webNavigation",
+    "webRequest",
+    "webRequestBlocking"
   ],
   "host_permissions": [
     "<all_urls>"
   ],
   "background": {
     "scripts": [
-      "background.js"
+      "background.firefox.js"
     ]
   },
   "icons": {

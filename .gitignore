@@ -1,3 +1,4 @@
 *.pem
 *.zip
 *.crx
+manifest.json
